@@ -22,23 +22,19 @@ June 27 (Sat) afternoon:
 
 ## Setup Method 1: Build from base image
 
-First, download base image:
-
-```
-vagrant box add hashicorp/precise32
-```
-
-`cd` into root folder of this repo and launch:
-
-```
-vagrant up
-```
+* Download base image: `vagrant box add hashicorp/precise32`
+* `cd method1`
+* `vagrant up`
 
 This usually takes 2 to 10 minutes depending on your network.
 
-## Setup Method 2: Use our packed box
+## Setup Method 2: Use our pre-built box
 
-Link to be released.
+* `cd method2`
+* Download pre-built image [hadoop.box](http://link/): To be released over workshop via USB stick.
+* `vagrant box add hadoop.box --name hadoop`
+* `vagrant init hadoop`
+* `vagrant up`
 
 ## Next
 
