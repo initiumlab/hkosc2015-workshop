@@ -21,3 +21,5 @@ ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7
 vagrant will substitute insecure key with a newly generated one upon `vagrant up`.
 This ensures that you can ssh into the packaged image.
 
+Related issue: https://github.com/mitchellh/vagrant/issues/5186
+
