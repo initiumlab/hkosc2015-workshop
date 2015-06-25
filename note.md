@@ -7,7 +7,7 @@ cd method1
 vagrant up
 ... wait to finish ...
 vagrant halt
-vagrant package --base {{instance-name}} --output hadoop.box
+vagrant package --base {{instance-name}} --output workshop.box
 ```
 
 ## Points to note when preparing method1
