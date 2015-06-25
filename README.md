@@ -31,7 +31,7 @@ This usually takes 2 to 10 minutes depending on your network.
 ## Setup Method 2: Use our pre-built box
 
 * `cd method2`
-* Download pre-built image [workshop.box](http://link/): To be released over workshop via USB stick.
+* Download pre-built image [workshop.box](https://www.dropbox.com/s/qp3jwxttg22akem/workshop.box?dl=0) to current folder: Also to be released over workshop via USB stick.
 * `vagrant box add workshop.box --name workshop`
 * `vagrant up`
 
