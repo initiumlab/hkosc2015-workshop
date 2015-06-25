@@ -15,8 +15,13 @@ Vagrant.configure(2) do |config|
   config.vm.box = "workshop"
 
   # Network configuration and port mapping
+  # TODO:
+  # The IP is hard-coded in Spark configuration?
+  # Needs better way to configure the environment.
   config.vm.network "private_network", ip: "192.168.33.11"
-  config.vm.network "public_network"
+  # The following line wil cause network error,
+  # so that shell provisioner fails
+  #config.vm.network "public_network"
   config.vm.network "forwarded_port", guest: 8080, host: 8081, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 8880, host: 8881, host_ip: "127.0.0.1"
 
@@ -74,6 +79,7 @@ Vagrant.configure(2) do |config|
 
 	export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/
 	export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0
+	export SPARK_HOME=~/spark
 
 	# In case there are junk processes left
 	#kilall java
