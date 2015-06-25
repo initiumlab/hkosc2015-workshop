@@ -13,6 +13,7 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "hashicorp/precise32"
+  config.vm.hostname = "master"
   
   # config.vm.box_url = "http://files.vagrantup.com/precise32.box"
 
@@ -25,6 +26,8 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 8080, host: 8081, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8880, host: 8881, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -72,10 +75,48 @@ Vagrant.configure(2) do |config|
     sudo apt-get -y update
   #   sudo apt-get install -y apache2
 	sudo apt-get -y install openjdk-7-jdk
+		
 	wget http://ftp.cuhk.edu.hk/pub/packages/apache.org/spark/spark-1.3.1/spark-1.3.1-bin-hadoop2.6.tgz
 	tar -zxf spark-1.3.1-bin-hadoop2.6.tgz
 	ln -s spark-1.3.1-bin-hadoop2.6 spark
+	
+	sudo apt-get -y install python-pip
+	sudo apt-get -y install python-dev
+	sudo apt-get -y install python-numpy
+	sudo apt-get -y install libzmq-dev
+	sudo pip install pyzmq
+	sudo pip install jinjia2
+	sudo pip install jsonschema
+	sudo pip install functools32
+	sudo pip install tornado
+	sudo pip install ipython[notebook]
+	sudo apt-get -y install unzip
+	sudo ipython profile create pyspark
+	sudo chmod 777 -R ~/.ipython/
+	mkdir /home/vagrant/spark/101workshop
+	
+	sudo cat << EOF | sudo tee /home/vagrant/.ipython/profile_pyspark/ipython_notebook_config.py
+c = get_config() 
+c.NotebookApp.ip = '*'
+c.NotebookApp.open_browser = False
+c.NotebookApp.port = 8880 # or whatever you want; be aware of conflicts with CDH
+EOF
+	
+	sudo cat << EOF | sudo tee /home/vagrant/.ipython/profile_pyspark/startup/00-pyspark-setup.py
+import os
+import sys
 
+spark_home = os.environ.get('SPARK_HOME', None)
+
+if not spark_home:
+    raise ValueError('SPARK_HOME environment variable is not set')
+
+sys.path.insert(0, os.path.join(spark_home, 'python'))
+sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
+
+execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
+EOF
+	
     # === Hadoop 2 setup ===
 
 
@@ -116,6 +157,12 @@ EOF
 	./sbin/hadoop-daemon.sh start datanode
 	./sbin/hadoop-daemon.sh start namenode
 	cd -
+
+	sudo cat << EOF | sudo tee /etc/hosts
+127.0.0.1		localhost
+192.168.33.11   master.domain.com  master
+192.168.33.12   worker2.domain.com worker2 
+EOF
 
   SHELL
 end
