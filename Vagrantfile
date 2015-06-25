@@ -85,7 +85,7 @@ Vagrant.configure(2) do |config|
 	sudo apt-get -y install python-numpy
 	sudo apt-get -y install libzmq-dev
 	sudo pip install pyzmq
-	sudo pip install jinjia2
+	sudo pip install jinja2
 	sudo pip install jsonschema
 	sudo pip install functools32
 	sudo pip install tornado
@@ -116,6 +116,9 @@ sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
 
 execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
 EOF
+
+	export SPARK_HOME=~/spark
+	echo 'export SPARK_HOME=~/spark' >> ~/.bashrc
 	
     # === Hadoop 2 setup ===
 
@@ -126,10 +129,11 @@ EOF
 
 	export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/
 	echo 'export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/' >> ~/.bashrc
+	export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0
+	echo 'export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0' >> ~/.bashrc
 
 	ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
 	cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
-	export HADOOP\_PREFIX=/home/vagrant/hadoop-2.7.0
 	ssh -o StrictHostKeyChecking=no localhost 'echo "ssh success"'
 
 	cd hadoop-2.7.0
