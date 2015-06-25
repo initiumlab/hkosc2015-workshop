@@ -2,6 +2,19 @@
 
 Files for HKOSC 2015 workshop on big data
 
+## Agenda
+
+June 26 (Fri) afternoon:
+
+* Basic introduction of this workshop
+* Hands-on Hadoop
+* Hands-on Spark
+
+June 27 (Sat) afternoon:
+
+* Hands-on GraphLab
+* Comparison between three platforms
+
 ## Dependencies
 
 * VirtualBox: https://www.virtualbox.org
