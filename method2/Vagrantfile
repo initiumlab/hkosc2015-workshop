@@ -29,7 +29,9 @@ Vagrant.configure(2) do |config|
   # The following line wil cause network error,
   # so that shell provisioner fails
   #config.vm.network "public_network"
+  config.vm.network "forwarded_port", guest: 4040, host: 4041, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 8080, host: 8081, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8081, host: 8082, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 8880, host: 8881, host_ip: "127.0.0.1"
 
   # Disable automatic box update checking. If you disable this, then
