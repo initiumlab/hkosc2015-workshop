@@ -1,0 +1,6 @@
+pyzmq
+jinja2
+jsonschema
+functools32
+tornado
+ipython[notebook]
