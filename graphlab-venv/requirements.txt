@@ -3,4 +3,9 @@ jinja2
 jsonschema
 functools32
 tornado
-ipython[notebook]
+ipython
+pandas
+numpy
+scipy
+matplotlib
+networkx
