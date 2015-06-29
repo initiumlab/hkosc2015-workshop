@@ -20,34 +20,16 @@ June 27 (Sat) afternoon:
 * VirtualBox: https://www.virtualbox.org
 * Vagrant: https://www.vagrantup.com/
 
-## Setup Hadoop+Spark: 
+## Preparation
 
-Method1: Build from base image
-(This usually takes 2 to 10 minutes depending on your network)
-
-* Download base image: `vagrant box add hashicorp/precise32`
-* `cd method1`
+* Download base image: `vagrant box add ubuntu/trusty64`
+* `cd all`
 * `vagrant up`
 
-Method 2: Use our pre-built box
-
-* `cd method2`
-* Download pre-built image [workshop.box](https://www.dropbox.com/s/qp3jwxttg22akem/workshop.box?dl=0) to current folder: Also to be released over workshop via USB stick.
-* `vagrant box add workshop.box --name workshop`
-* `vagrant up`
-
-## Setup GraphLab: 
-
-Method1: Building from scratch:
-
-* Download base image: `vagrant box add hashicorp/precise32`
-* `cd graphlab`
-* `vagrant up`
-
-Method2: Copy the image+Vagrantfile from our USB sticks and do `vagrant up`.
+(This usually takes 5 to 20 minutes depending on your network)
 
 ## Next
 
-Enjoy testing those platforms during the workshop
+Enjoy testing those platforms with the help of slides under `slides` folder.
 
 
