@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "hashicorp/precise32"
+  config.vm.box = "ubuntu/trusty64"
   config.vm.hostname = "master"
 
   config.vm.provider "virtualbox" do |v|
@@ -77,106 +77,31 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", privileged:false, inline: <<-SHELL 
-    sudo apt-get -y update
+    echo "Provisioning"
+    echo "Running shell as:" `whoami`
+    
+    # ===== Update source list =====
+	#sudo rm /etc/apt/sources.list
+    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty main' | sudo tee /etc/apt/sources.list
+    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty main' | sudo tee -a /etc/apt/sources.list
+    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty universe' | sudo tee -a /etc/apt/sources.list
+    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty universe' | sudo tee -a /etc/apt/sources.list
+    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty restricted' | sudo tee -a /etc/apt/sources.list
+    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty restricted' | sudo tee -a /etc/apt/sources.list
+    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty multiverse' | sudo tee -a /etc/apt/sources.list
+    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty multiverse' | sudo tee -a /etc/apt/sources.list
 
-    # ===== Spark Setup =====
-	sudo apt-get -y install openjdk-7-jdk
-		
-	wget http://ftp.cuhk.edu.hk/pub/packages/apache.org/spark/spark-1.3.1/spark-1.3.1-bin-hadoop2.6.tgz
-	tar -zxf spark-1.3.1-bin-hadoop2.6.tgz
-	ln -s spark-1.3.1-bin-hadoop2.6 spark
-	
+    sudo apt-get -y update
 	sudo apt-get -y install python-pip
 	sudo apt-get -y install python-dev
 	sudo apt-get -y install python-numpy
+	sudo apt-get -y install python-scipy
+	sudo apt-get -y install python-matplotlib
+	sudo apt-get -y install python-pandas
 	sudo apt-get -y install libzmq-dev
-	sudo pip install pyzmq
-	sudo pip install jinja2
-	sudo pip install jsonschema
-	sudo pip install functools32
-	sudo pip install tornado
-	sudo pip install ipython[notebook]
-	sudo apt-get -y install unzip
-	sudo ipython profile create pyspark
-	sudo chmod 777 -R ~/.ipython/
-	mkdir /home/vagrant/spark/101workshop
-	
-	sudo cat << EOF | sudo tee /home/vagrant/.ipython/profile_pyspark/ipython_notebook_config.py
-c = get_config() 
-c.NotebookApp.ip = '*'
-c.NotebookApp.open_browser = False
-c.NotebookApp.port = 8880 # or whatever you want; be aware of conflicts with CDH
-EOF
-	
-	sudo cat << EOF | sudo tee /home/vagrant/.ipython/profile_pyspark/startup/00-pyspark-setup.py
-import os
-import sys
 
-spark_home = os.environ.get('SPARK_HOME', None)
+	sudo pip install --upgrade pip
 
-if not spark_home:
-    raise ValueError('SPARK_HOME environment variable is not set')
-
-sys.path.insert(0, os.path.join(spark_home, 'python'))
-sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
-
-execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
-EOF
-
-	sudo cat << EOF | sudo tee /etc/hosts
-127.0.0.1		localhost
-192.168.33.11   master.domain.com  master
-192.168.33.12   worker2.domain.com worker2 
-EOF
-
-	export SPARK_HOME=~/spark
-	echo 'export SPARK_HOME=~/spark' >> ~/.bashrc
-	
-    # ===== Hadoop 2 setup =====
-
-
-	#USER_HOME="/home/vagrant"
-	wget 'http://apache.communilink.net/hadoop/common/hadoop-2.7.0/hadoop-2.7.0.tar.gz'
-	tar -xzvf hadoop-2.7.0.tar.gz 
-
-	export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/
-	echo 'export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/' >> ~/.bashrc
-	export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0
-	echo 'export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0' >> ~/.bashrc
-
-	ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
-	cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
-	ssh -o StrictHostKeyChecking=no localhost 'echo "ssh success"'
-
-	cd hadoop-2.7.0
-
-	cat << EOF > etc/hadoop/core-site.xml
-<configuration>
-<property>
-<name>fs.defaultFS</name>
-<value>hdfs://localhost:9000</value>
-</property>
-</configuration>
-EOF
-
-	cat << EOF > etc/hadoop/hdfs-site.xml:
-<configuration>
-<property>
-<name>dfs.replication</name>
-<value>1</value>
-</property>
-</configuration>
-EOF
-
-	./bin/hdfs namenode -format
-
-	./sbin/hadoop-daemon.sh start datanode
-	./sbin/hadoop-daemon.sh start namenode
-	cd -
-
-
-
-	# ===== Install GraphLab =====
 	cat << EOF > requirements.txt
 pyzmq
 jinja2
@@ -184,19 +109,16 @@ jsonschema
 functools32
 tornado
 ipython
-pandas
-numpy
-scipy
-matplotlib
 networkx
 EOF
+
 	sudo pip install -r requirements.txt
-	sudo pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-
-	Create/1.4.1/e-hkosc15@hupili.net/64CA-557D-92A5-F7D8-91A9-
-	CC38-C9C3-BBB9/GraphLab-Create-License.tar.gz
+
+	sudo pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-Create/1.4.1/e-hkosc15@hupili.net/64CA-557D-92A5-F7D8-91A9-CC38-C9C3-BBB9/GraphLab-Create-License.tar.gz
 
     # ===== Clone the repo to get all related resources =====
-    git clone git@github.com:initiummedia/hkosc2015-workshop.git
+    sudo apt-get install -y git
+    git clone git://github.com/initiummedia/hkosc2015-workshop.git
 
     # ===== Insecure key will be substituted by Vagrant upon provisioning =====
 	echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key" >> ~/.ssh/authorized_keys
