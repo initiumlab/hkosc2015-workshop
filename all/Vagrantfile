@@ -128,7 +128,7 @@ EOF
 	
 	ipython profile create default
     #sudo chmod 777 -R ~/.ipython/
-	mkdir /home/vagrant/spark/101workshop
+	mkdir -p /home/vagrant/spark/101workshop
 	
 	cat << EOF > /home/vagrant/.ipython/profile_default/ipython_notebook_config.py
 c = get_config() 
@@ -149,7 +149,7 @@ if not spark_home:
 sys.path.insert(0, os.path.join(spark_home, 'python'))
 sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
 
-execfile(os.path.join(spark_home, 'python/default/shell.py'))
+execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
 EOF
 
 	sudo cat << EOF | sudo tee /etc/hosts
@@ -208,6 +208,8 @@ EOF
 
     # ===== Insecure key will be substituted by Vagrant upon provisioning =====
 	echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key" >> ~/.ssh/authorized_keys
+
+	nohup ipython notebook & 
 
   SHELL
 end

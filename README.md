@@ -44,6 +44,6 @@ Change the downloading link in `all/Vagrantfile` accordingly:
 Enjoy testing those platforms with the help of slides under `slides` folder.
 
 * Hadoop: `cd hadoop` and follow instructions on slides
-* Spark: `cd spark/101workshop; ipython notebook --profile pyspark --no-browser` and follow instructions on slides
-* GraphLab: `ipython notebook --no-browser` and follow instructions on slides
+* Spark: visit <http://localhost:18888/> and follow instructions on slides
+* GraphLab: visit <http://localhost:18888/> and follow instructions on slides
 
