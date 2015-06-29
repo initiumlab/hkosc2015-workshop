@@ -32,7 +32,7 @@ Vagrant.configure(2) do |config|
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # config.vm.network "forwarded_port", guest: 80, host: 8080
   config.vm.network "forwarded_port", guest: 8080, host: 8081, host_ip: "127.0.0.1"
-  config.vm.network "forwarded_port", guest: 8880, host: 8881, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8888, host: 18888, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -81,24 +81,110 @@ Vagrant.configure(2) do |config|
     echo "Running shell as:" `whoami`
     
     # ===== Update source list =====
-	#sudo rm /etc/apt/sources.list
-    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty main' | sudo tee /etc/apt/sources.list
-    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty main' | sudo tee -a /etc/apt/sources.list
-    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty universe' | sudo tee -a /etc/apt/sources.list
-    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty universe' | sudo tee -a /etc/apt/sources.list
-    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty restricted' | sudo tee -a /etc/apt/sources.list
-    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty restricted' | sudo tee -a /etc/apt/sources.list
-    echo 'deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty multiverse' | sudo tee -a /etc/apt/sources.list
-    echo 'deb-src http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty multiverse' | sudo tee -a /etc/apt/sources.list
+	sudo cat << EOF | sudo tee /etc/apt/sources.list
+deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty main restricted universe multiverse
+deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty-updates main restricted universe multiverse
+deb http://ftp.cuhk.edu.hk/pub/Linux/ubuntu/ trusty-backports main restricted universe multiverse
+deb http://security.ubuntu.com/ubuntu trusty-security main restricted universe multiverse
+deb http://archive.canonical.com/ubuntu trusty partner
+EOF
 
     sudo apt-get -y update
+
+	sudo apt-get -y install openjdk-7-jdk
+	sudo apt-get -y install libzmq-dev
+	sudo apt-get -y install unzip
+
 	sudo apt-get -y install python-pip
 	sudo apt-get -y install python-dev
 	sudo apt-get -y install python-numpy
 	sudo apt-get -y install python-scipy
 	sudo apt-get -y install python-matplotlib
 	sudo apt-get -y install python-pandas
-	sudo apt-get -y install libzmq-dev
+		
+    # ===== Spark =====
+	export SPARK_HOME=~/spark
+	echo 'export SPARK_HOME=~/spark' >> ~/.bashrc
+	
+	wget http://ftp.cuhk.edu.hk/pub/packages/apache.org/spark/spark-1.3.1/spark-1.3.1-bin-hadoop2.6.tgz
+	tar -zxf spark-1.3.1-bin-hadoop2.6.tgz
+	ln -s spark-1.3.1-bin-hadoop2.6 spark
+	
+	ipython profile create pyspark
+    #sudo chmod 777 -R ~/.ipython/
+	mkdir /home/vagrant/spark/101workshop
+	
+	cat << EOF > /home/vagrant/.ipython/profile_pyspark/ipython_notebook_config.py
+c = get_config() 
+c.NotebookApp.ip = '*'
+c.NotebookApp.open_browser = False
+c.NotebookApp.port = 8888 # or whatever you want; be aware of conflicts with CDH
+EOF
+	
+	cat << EOF > /home/vagrant/.ipython/profile_pyspark/startup/00-pyspark-setup.py
+import os
+import sys
+
+spark_home = os.environ.get('SPARK_HOME', None)
+
+if not spark_home:
+    raise ValueError('SPARK_HOME environment variable is not set')
+
+sys.path.insert(0, os.path.join(spark_home, 'python'))
+sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.8.2.1-src.zip'))
+
+execfile(os.path.join(spark_home, 'python/pyspark/shell.py'))
+EOF
+
+    # === Hadoop 2 setup ===
+	export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/
+	echo 'export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre/' >> ~/.bashrc
+	export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0
+	echo 'export HADOOP_PREFIX=/home/vagrant/hadoop-2.7.0' >> ~/.bashrc
+
+	wget 'http://apache.communilink.net/hadoop/common/hadoop-2.7.0/hadoop-2.7.0.tar.gz'
+	tar -xzvf hadoop-2.7.0.tar.gz 
+
+	ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
+	cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
+	ssh -o StrictHostKeyChecking=no localhost 'echo "ssh success"'
+
+	cd hadoop-2.7.0
+
+	cat << EOF > etc/hadoop/core-site.xml
+<configuration>
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://localhost:9000</value>
+</property>
+</configuration>
+EOF
+
+	cat << EOF > etc/hadoop/hdfs-site.xml
+<configuration>
+<property>
+<name>dfs.replication</name>
+<value>1</value>
+</property>
+</configuration>
+EOF
+
+	./bin/hdfs namenode -format
+
+	./sbin/hadoop-daemon.sh start datanode
+	./sbin/hadoop-daemon.sh start namenode
+	cd -
+
+	echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key" >> ~/.ssh/authorized_keys
+
+
+	sudo cat << EOF | sudo tee /etc/hosts
+127.0.0.1		localhost
+192.168.33.11   master.domain.com  master
+192.168.33.12   worker2.domain.com worker2 
+EOF
+
+    # ===== GraphLab =====
 
 	sudo pip install --upgrade pip
 
