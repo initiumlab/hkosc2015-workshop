@@ -20,34 +20,30 @@ June 27 (Sat) afternoon:
 * VirtualBox: https://www.virtualbox.org
 * Vagrant: https://www.vagrantup.com/
 
-## Setup Hadoop+Spark: 
+## GraphLab Create License
 
-Method1: Build from base image
-(This usually takes 2 to 10 minutes depending on your network)
+Apply a license by following instructions in page
+<https://dato.com/download/>
 
-* Download base image: `vagrant box add hashicorp/precise32`
-* `cd method1`
+Change the downloading link in `all/Vagrantfile` accordingly:
+
+```
+	sudo pip install --upgrade --no-cache-dir https://get.dato.com/GraphLab-Create/1.4.1/e-hkosc15@hupili.net/64CA-557D-92A5-F7D8-91A9-CC38-C9C3-BBB9/GraphLab-Create-License.tar.gz
+```
+
+## Preparation
+
+* Download base image: `vagrant box add ubuntu/trusty64`
+* `cd all`
 * `vagrant up`
 
-Method 2: Use our pre-built box
-
-* `cd method2`
-* Download pre-built image [workshop.box](https://www.dropbox.com/s/qp3jwxttg22akem/workshop.box?dl=0) to current folder: Also to be released over workshop via USB stick.
-* `vagrant box add workshop.box --name workshop`
-* `vagrant up`
-
-## Setup GraphLab: 
-
-Method1: Building from scratch:
-
-* Download base image: `vagrant box add hashicorp/precise32`
-* `cd graphlab`
-* `vagrant up`
-
-Method2: Copy the image+Vagrantfile from our USB sticks and do `vagrant up`.
+(This usually takes 5 to 20 minutes depending on your network)
 
 ## Next
 
-Enjoy testing those platforms during the workshop
+Enjoy testing those platforms with the help of slides under `slides` folder.
 
+* Hadoop: `cd hadoop` and follow instructions on slides
+* Spark: visit <http://localhost:18888/> and follow instructions on slides
+* GraphLab: visit <http://localhost:18888/> and follow instructions on slides
 
