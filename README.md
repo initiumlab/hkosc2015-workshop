@@ -47,3 +47,10 @@ Enjoy testing those platforms with the help of slides under `slides` folder.
 * Spark: visit <http://localhost:18888/> and follow instructions on slides
 * GraphLab: visit <http://localhost:18888/> and follow instructions on slides
 
+## Some history iPython notebooks
+
+Find in folder `history-envs/graphlab-venv`:
+
+* `PageRank.ipynb`  
+* `Recommender.ipynb`
+
